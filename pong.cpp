@@ -18,7 +18,7 @@ int main() {
     // Criar o texto
     sf::Text text;
     text.setFont(font);
-    text.setString("Lais Pong!");
+    text.setString("Pong!");
     text.setCharacterSize(50); // Tamanho da fonte
     text.setFillColor(sf::Color::White); // Cor do texto
 
