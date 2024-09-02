@@ -55,9 +55,16 @@ int main() {
     ball.setPosition(395, 295);
     ball.setFillColor(sf::Color::White);
 
+    // Cria PowerUp
+    sf::RectangleShape power(sf::Vector2f(50, 50));
+    power.setFillColor(sf::Color::Yellow);
+    bool showPower = false;
+
     // Define a velocidade da bola
-    float ballSpeedX = -0.04f, ballSpeedY = -0.05f;
+    float ballSpeedX = -0.03f, ballSpeedY = -0.03f;
     float playerSpeed = 0.2f;
+    bool powerUpSpawned = false;
+
 
     // Loop do game
     while (window.isOpen()) {
@@ -65,7 +72,7 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-
+                
             if (event.type == sf::Event::KeyPressed) {
                 std::cout << "Key pressed: " << event.key.code << std::endl;
             }
@@ -116,12 +123,39 @@ int main() {
         // Esse IF faz a validação se a bola bateu na raquete, aqui vamos alterar para fazer o https://github.com/marchiore/pongcpp/issues/5
         if (ball.getGlobalBounds().intersects(player1.getGlobalBounds()) || 
             ball.getGlobalBounds().intersects(player2.getGlobalBounds())) {
-            ballSpeedX = -ballSpeedX;
+            ballSpeedX =- ballSpeedX;
+            
         }
 
         if (ball.getPosition().x <= 0 || ball.getPosition().x >= 790) {
-            ball.setPosition(395, 295);
-            ballSpeedX = -ballSpeedX;
+            ballSpeedX =- ballSpeedX;
+        }
+
+
+        if (ball.getPosition().y <= 0 || ball.getPosition().y >= 790) {
+            ballSpeedY =+ ballSpeedY;
+        }
+
+        //  PowerUp aparece apos condicao de pontuacao
+        if ((player1Score > 3 && player2Score > 3) && !powerUpSpawned)
+        {
+            showPower = true;
+            powerUpSpawned = true;
+            power.setPosition(395, 295);
+        }
+
+        //  Efeito do PowerUp apos interseccao com a bola
+        if (showPower && ball.getGlobalBounds().intersects(power.getGlobalBounds()))
+        {
+            showPower = false; // PowerUp desaparece
+            player1.setSize(sf::Vector2f(10, 150));
+            player2.setSize(sf::Vector2f(10, 150));
+        }
+
+        //  Velocidade da Bola aumenta apos condicao de pontuacao
+        if (player1Score >= 5 && player2Score >= 5)
+        {
+            ball.move(ballSpeedX * 1.2f, ballSpeedY * 1.2f);
         }
 
 
@@ -129,9 +163,12 @@ int main() {
         window.clear();
         window.draw(player1Text);
         window.draw(player2Text);
+        window.draw(ball);
+        if (showPower) {
+            window.draw(power); // Draw the power-up only if it's supposed to be visible
+        }
         window.draw(player1);
         window.draw(player2);
-        window.draw(ball);
 
         // window.draw(text); // Desenhar o texto na tela
         window.display();
